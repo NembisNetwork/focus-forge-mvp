@@ -73,18 +73,22 @@ function NewPlan() {
         deadline: deadline.trim(),
         difficulty,
         context: context.trim() || undefined,
-        summary: result.summary,
+        title: result.title || goal.trim(),
+        description: result.description,
         createdAt: new Date().toISOString(),
-        tasks: result.tasks.map((task) => ({ ...task, id: makeId(), done: false })),
+        tasks: result.tasks.map((task) => ({ ...task, id: makeId(), completed: false })),
       });
 
       navigate({ to: "/plan/$planId", params: { planId: id } });
     } catch {
-      setError("We couldn't build that plan just now. Please try again in a moment.");
+      setError(
+        "We couldn't build that plan just now — the AI service may be busy or returned something unexpected. Please try again in a moment.",
+      );
     } finally {
       setLoading(false);
     }
   }
+
 
   return (
     <main className="min-h-screen glow-surface">

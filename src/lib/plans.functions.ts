@@ -105,7 +105,13 @@ export const generatePlan = createServerFn({ method: "POST" })
     }
 
     if (!response.ok) {
-      console.error("OpenAI error", response.status, await response.text().catch(() => ""));
+      const errorText = await response.text().catch(() => "");
+      console.error("OpenAI error", response.status, errorText);
+      if (errorText.includes("insufficient_quota") || errorText.includes("credit_balance_exhausted")) {
+        throw new PlanGenerationError(
+          "The AI account is out of credits. Please top it up, then try again.",
+        );
+      }
       throw new PlanGenerationError(
         response.status === 429
           ? "The planning service is busy. Please try again in a moment."

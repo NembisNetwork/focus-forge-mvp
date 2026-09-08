@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CalendarDays, Clock, PartyPopper } from "lucide-react";
 
-import { DifficultyBadge } from "@/components/plan-bits";
+import { DifficultyBadge, PriorityBadge } from "@/components/plan-bits";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";

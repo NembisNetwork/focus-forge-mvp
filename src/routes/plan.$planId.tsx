@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CalendarDays, Clock, PartyPopper } from "lucide-react";
 
-import { DifficultyBadge } from "@/components/plan-bits";
+import { DifficultyBadge, PriorityBadge } from "@/components/plan-bits";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
@@ -59,12 +59,13 @@ function PlanDetail() {
   }
 
   const { done, total, percent } = planProgress(plan);
-  const totalMinutes = plan.tasks.reduce((sum, task) => sum + task.estimateMinutes, 0);
 
   return (
     <Shell>
-      <h1 className="text-3xl font-semibold sm:text-4xl">{plan.goal}</h1>
-      <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">{plan.summary}</p>
+      <h1 className="text-3xl font-semibold sm:text-4xl">{plan.title || plan.goal}</h1>
+      <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
+        {plan.description}
+      </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1">
@@ -73,7 +74,7 @@ function PlanDetail() {
         </span>
         <span className="inline-flex items-center gap-1">
           <Clock className="size-3.5" aria-hidden />
-          {Math.round(totalMinutes / 60)}h of focused work
+          {total} steps
         </span>
         <DifficultyBadge difficulty={plan.difficulty} />
       </div>
@@ -99,27 +100,27 @@ function PlanDetail() {
           <li
             key={task.id}
             className={`flex gap-4 rounded-2xl border border-border/70 bg-card p-4 transition-opacity ${
-              task.done ? "opacity-60" : ""
+              task.completed ? "opacity-60" : ""
             }`}
           >
             <Checkbox
               id={task.id}
-              checked={task.done}
+              checked={task.completed}
               onCheckedChange={() => toggleTask(plan.id, task.id)}
               className="mt-1 size-5"
-              aria-label={`Mark "${task.title}" as ${task.done ? "not done" : "done"}`}
+              aria-label={`Mark "${task.title}" as ${task.completed ? "not done" : "done"}`}
             />
             <div className="min-w-0">
               <label
                 htmlFor={task.id}
-                className={`font-display text-base font-semibold ${task.done ? "line-through" : ""}`}
+                className={`font-display text-base font-semibold ${task.completed ? "line-through" : ""}`}
               >
                 {index + 1}. {task.title}
               </label>
-              <p className="mt-1 text-sm text-muted-foreground">{task.detail}</p>
-              <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                <span>{task.estimateMinutes} min</span>
-                {task.dueHint ? <span className="text-accent">{task.dueHint}</span> : null}
+              <p className="mt-1 text-sm text-muted-foreground">{task.description}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                <PriorityBadge priority={task.priority} />
+                {task.estimated_time ? <span>{task.estimated_time}</span> : null}
               </div>
             </div>
           </li>
@@ -128,6 +129,7 @@ function PlanDetail() {
     </Shell>
   );
 }
+
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (

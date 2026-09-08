@@ -4,13 +4,39 @@ import { CalendarDays, Flame, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { deletePlan, planProgress, type Difficulty, type Plan } from "@/lib/plan-store";
+import {
+  deletePlan,
+  planProgress,
+  type Difficulty,
+  type Plan,
+  type Priority,
+} from "@/lib/plan-store";
 
 const difficultyLabel: Record<Difficulty, string> = {
   easy: "Light",
   medium: "Steady",
   hard: "Intense",
 };
+
+const priorityLabel: Record<Priority, string> = {
+  high: "High priority",
+  medium: "Medium priority",
+  low: "Low priority",
+};
+
+const priorityClass: Record<Priority, string> = {
+  high: "border-primary/50 bg-primary/15 text-primary",
+  medium: "border-accent/50 bg-accent/15 text-accent",
+  low: "border-border/70 bg-secondary/60 text-muted-foreground",
+};
+
+export function PriorityBadge({ priority }: { priority: Priority }) {
+  return (
+    <Badge variant="outline" className={`text-xs font-medium ${priorityClass[priority]}`}>
+      {priorityLabel[priority]}
+    </Badge>
+  );
+}
 
 export function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
   return (
@@ -31,9 +57,10 @@ export function PlanCard({ plan }: { plan: Plan }) {
     <article className="group relative flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/50">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-semibold">{plan.goal}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{plan.summary}</p>
+          <h3 className="truncate text-lg font-semibold">{plan.title || plan.goal}</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{plan.description}</p>
         </div>
+
         <Button
           size="icon"
           variant="ghost"

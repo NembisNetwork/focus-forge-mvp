@@ -16,7 +16,7 @@ export type Plan = {
   goal: string;
   deadline: string;
   difficulty: Difficulty;
-  context?: string;
+  context?: string | undefined;
   summary: string;
   createdAt: string;
   tasks: Task[];

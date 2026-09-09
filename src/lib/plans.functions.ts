@@ -26,35 +26,12 @@ export type GeneratedPlan = z.infer<typeof GeneratedPlan>;
 
 export class PlanGenerationError extends Error {}
 
-const jsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["title", "description", "tasks"],
-  properties: {
-    title: { type: "string" },
-    description: { type: "string" },
-    tasks: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["title", "description", "priority", "estimated_time", "completed"],
-        properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-          priority: { type: "string", enum: ["high", "medium", "low"] },
-          estimated_time: { type: "string" },
-          completed: { type: "boolean" },
-        },
-      },
-    },
-  },
-} as const;
+
 
 export const generatePlan = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PlanInput.parse(input))
   .handler(async ({ data }) => {
-    const key = process.env["OPENAI_API_KEY"];
+    const key = process.env["GEMINI_API_KEY"];
     if (!key) throw new PlanGenerationError("AI is not configured yet.");
 
     const prompt = [
@@ -77,37 +54,65 @@ export const generatePlan = createServerFn({ method: "POST" })
 
     let response: Response;
     try {
-      response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${key}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a pragmatic planning coach for students, freelancers and young professionals. You produce specific, doable steps in JSON, never vague advice.",
-            },
-            { role: "user", content: prompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: { name: "action_plan", strict: true, schema: jsonSchema },
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-goog-api-key": key,
           },
-        }),
-      });
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [
+                {
+                  text: "You are a pragmatic planning coach for students, freelancers and young professionals. You produce specific, doable steps in JSON, never vague advice.",
+                },
+              ],
+            },
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "OBJECT",
+                required: ["title", "description", "tasks"],
+                properties: {
+                  title: { type: "STRING" },
+                  description: { type: "STRING" },
+                  tasks: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      required: ["title", "description", "priority", "estimated_time", "completed"],
+                      properties: {
+                        title: { type: "STRING" },
+                        description: { type: "STRING" },
+                        priority: { type: "STRING", enum: ["high", "medium", "low"] },
+                        estimated_time: { type: "STRING" },
+                        completed: { type: "BOOLEAN" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }),
+        },
+      );
     } catch (error) {
-      console.error("OpenAI request failed", error);
+      console.error("Gemini request failed", error);
       throw new PlanGenerationError("The planning service is unreachable right now.");
     }
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
-      console.error("OpenAI error", response.status, errorText);
-      if (errorText.includes("insufficient_quota") || errorText.includes("credit_balance_exhausted")) {
+      console.error("Gemini error", response.status, errorText);
+      if (
+        errorText.includes("insufficient_quota") ||
+        errorText.includes("credit_balance_exhausted") ||
+        errorText.includes("quota") ||
+        errorText.includes("RESOURCE_EXHAUSTED")
+      ) {
         throw new PlanGenerationError(
           "The AI account is out of credits. Please top it up, then try again.",
         );
@@ -120,9 +125,11 @@ export const generatePlan = createServerFn({ method: "POST" })
     }
 
     const payload = (await response.json().catch(() => null)) as
-      | { choices?: { message?: { content?: string } }[] }
+      | { candidates?: { content?: { parts?: { text?: string }[] } }[] }
       | null;
-    const content = payload?.choices?.[0]?.message?.content;
+    const content = payload?.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? "")
+      .join("");
     const parsed = safeParse(content);
     if (!parsed || parsed.tasks.length === 0) {
       throw new PlanGenerationError("The plan came back in an unexpected shape.");

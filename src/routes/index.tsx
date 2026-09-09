@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, ListChecks, Plus, Sparkles, Target } from "lucide-react";
+import { CheckCircle2, ListChecks, Plus, Target } from "lucide-react";
 
+import { PlandooLogo } from "@/components/plandoo-logo";
 import { PlanCard } from "@/components/plan-bits";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,13 +10,13 @@ import { planProgress, usePlans } from "@/lib/plan-store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Momentum AI Planner" },
+      { title: "Dashboard — Plandoo AI Planner" },
       {
         name: "description",
         content:
-          "See every goal, its deadline and your progress in one place. Momentum turns goals into AI-generated task plans.",
+          "See every goal, its deadline and your progress in one place. Plandoo turns goals into AI-generated task plans.",
       },
-      { property: "og:title", content: "Dashboard — Momentum AI Planner" },
+      { property: "og:title", content: "Dashboard — Plandoo AI Planner" },
       {
         property: "og:description",
         content: "Every goal, deadline and step of progress in one focused dashboard.",
@@ -38,10 +39,8 @@ function Dashboard() {
       <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <Sparkles className="size-5" aria-hidden />
-            </span>
-            <span className="font-display text-lg font-semibold">Momentum</span>
+            <PlandooLogo />
+            <span className="font-display text-lg font-semibold">Plandoo</span>
           </div>
           <Button asChild>
             <Link to="/new">
@@ -56,7 +55,7 @@ function Dashboard() {
             Your goals, broken into steps you can actually start today.
           </h1>
           <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-            Describe a goal, set a deadline and pick an intensity. Momentum writes the plan and
+            Describe a goal, set a deadline and pick an intensity. Plandoo writes the plan and
             keeps score as you check things off.
           </p>
         </section>

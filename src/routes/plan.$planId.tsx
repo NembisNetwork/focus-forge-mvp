@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, CalendarDays, Clock, PartyPopper } from "lucide-react";
+import { toast } from "sonner";
 
 import { DifficultyBadge, PriorityBadge } from "@/components/plan-bits";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,13 @@ import { planProgress, toggleTask, usePlans } from "@/lib/plan-store";
 export const Route = createFileRoute("/plan/$planId")({
   head: () => ({
     meta: [
-      { title: "Plan details — Momentum AI Planner" },
+       { title: "Plan details — Plandoo AI Planner" },
       {
         name: "description",
         content:
           "Work through your AI-generated steps, tick them off and watch your progress bar fill up.",
       },
-      { property: "og:title", content: "Plan details — Momentum AI Planner" },
+       { property: "og:title", content: "Plan details — Plandoo AI Planner" },
       {
         property: "og:description",
         content: "Tick off AI-generated steps and track progress toward your deadline.",
@@ -99,14 +100,18 @@ function PlanDetail() {
         {plan.tasks.map((task, index) => (
           <li
             key={task.id}
-            className={`flex gap-4 rounded-2xl border border-border/70 bg-card p-4 transition-opacity ${
+            style={{ animationDelay: `${Math.min(index * 55, 330)}ms` }}
+            className={`animate-task-in flex gap-4 rounded-2xl border border-border/70 bg-card p-4 transition-all duration-300 ${
               task.completed ? "opacity-60" : ""
             }`}
           >
             <Checkbox
               id={task.id}
               checked={task.completed}
-              onCheckedChange={() => toggleTask(plan.id, task.id)}
+              onCheckedChange={() => {
+                toggleTask(plan.id, task.id);
+                if (!task.completed) toast.success("Task completed");
+              }}
               className="mt-1 size-5"
               aria-label={`Mark "${task.title}" as ${task.completed ? "not done" : "done"}`}
             />

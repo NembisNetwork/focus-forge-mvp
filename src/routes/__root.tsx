@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -77,13 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Momentum — AI Task & Event Planner" },
+        { title: "Plandoo — AI Task & Event Planner" },
       {
         name: "description",
         content:
-          "Turn any goal into an ordered, doable plan. Momentum builds AI task lists with deadlines and tracks your progress.",
+          "Turn any goal into an ordered, doable plan. Plandoo builds AI task lists with deadlines and tracks your progress.",
       },
-      { property: "og:title", content: "Momentum — AI Task & Event Planner" },
+      { property: "og:title", content: "Plandoo — AI Task & Event Planner" },
       {
         property: "og:description",
         content: "Turn any goal into an ordered, doable plan with AI-generated tasks.",
@@ -102,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
 
@@ -133,6 +134,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }

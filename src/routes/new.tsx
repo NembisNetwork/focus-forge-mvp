@@ -2,6 +2,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +14,13 @@ import { makeId, savePlan, type Difficulty } from "@/lib/plan-store";
 export const Route = createFileRoute("/new")({
   head: () => ({
     meta: [
-      { title: "Create a plan — Momentum AI Planner" },
+      { title: "Create a plan — Plandoo AI Planner" },
       {
         name: "description",
         content:
           "Enter your goal, deadline and intensity, and get an ordered AI-generated task plan in seconds.",
       },
-      { property: "og:title", content: "Create a plan — Momentum AI Planner" },
+      { property: "og:title", content: "Create a plan — Plandoo AI Planner" },
       {
         property: "og:description",
         content: "Goal in, ordered action plan out. Set a deadline and intensity to start.",
@@ -79,11 +80,15 @@ function NewPlan() {
         tasks: result.tasks.map((task) => ({ ...task, id: makeId(), completed: false })),
       });
 
+      toast.success("Plan created", { description: "Your next steps are ready." });
       navigate({ to: "/plan/$planId", params: { planId: id } });
     } catch {
       setError(
         "We couldn't build that plan just now — the AI service may be busy or returned something unexpected. Please try again in a moment.",
       );
+      toast.error("Couldn't generate your plan", {
+        description: "Please try again in a moment.",
+      });
     } finally {
       setLoading(false);
     }

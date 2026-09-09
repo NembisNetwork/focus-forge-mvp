@@ -26,30 +26,7 @@ export type GeneratedPlan = z.infer<typeof GeneratedPlan>;
 
 export class PlanGenerationError extends Error {}
 
-const jsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["title", "description", "tasks"],
-  properties: {
-    title: { type: "string" },
-    description: { type: "string" },
-    tasks: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["title", "description", "priority", "estimated_time", "completed"],
-        properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-          priority: { type: "string", enum: ["high", "medium", "low"] },
-          estimated_time: { type: "string" },
-          completed: { type: "boolean" },
-        },
-      },
-    },
-  },
-} as const;
+
 
 export const generatePlan = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PlanInput.parse(input))

@@ -55,7 +55,7 @@ export const generatePlan = createServerFn({ method: "POST" })
     let response: Response;
     try {
       response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent`,
         {
           method: "POST",
           headers: {

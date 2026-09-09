@@ -54,7 +54,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
   const { done, total, percent } = planProgress(plan);
 
   return (
-    <article className="group relative flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/50">
+    <article className="group relative flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-lg font-semibold">{plan.title || plan.goal}</h3>
